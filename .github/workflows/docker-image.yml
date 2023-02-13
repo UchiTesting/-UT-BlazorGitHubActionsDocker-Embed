@@ -2,9 +2,9 @@ name: Docker Image CI for AMD64
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
   # Allow manual run of the pipeline
   workflow_dispatch:
@@ -33,4 +33,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rasp-test:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rasp-test:latest-embed
