@@ -12,6 +12,9 @@ on:
   # Allow manual run of the pipeline
   workflow_dispatch:
 
+env:
+  UT_PROJECT_LOCATION: ./embedApp/rasp-embed/rasp-embed.csproj
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,9 +27,9 @@ jobs:
           # According to https://github.com/actions/runner-images/issues/6539#issuecomment-1314127790
           dotnet-version: 7.x.x
       - name: Restore dependencies
-        run: dotnet restore ./embedApp/rasp-embed/rasp-embed.csproj
+        run: dotnet restore $UT_PROJECT_LOCATION
       - name: Build
-        run: dotnet build --no-restore ./embedApp/rasp-embed/rasp-embed.csproj && pwd && ls -l
+        run: dotnet build --no-restore $UT_PROJECT_LOCATION && pwd && ls -l
 
   test:
     needs: build
@@ -39,7 +42,7 @@ jobs:
         with:
           dotnet-version: 7.x.x
       - name: Test
-        run: dotnet test --no-build --verbosity normal ./embedApp/rasp-embed/rasp-embed.csproj
+        run: dotnet test --no-build --verbosity normal $UT_PROJECT_LOCATION
 
   containerize:
     needs: test
@@ -57,10 +60,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Add Containerizing NuGet package
-        run: dotnet add ./embedApp/rasp-embed/rasp-embed.csproj package Microsoft.NET.Build.Containers --version 0.3.2
+        run: dotnet add $UT_PROJECT_LOCATION package Microsoft.NET.Build.Containers --version 0.3.2
       - name: Containerize with .NET 7.0
-        run: dotnet publish ./embedApp/rasp-embed/rasp-embed.csproj --os linux --arch arm64 -p:PublishProfile=DefaultContainer
+        run: dotnet publish $UT_PROJECT_LOCATION --os linux --arch arm64 -p:PublishProfile=DefaultContainer
       - name: Remove Containerizing NuGet package
-        run: dotnet remove ./embedApp/rasp-embed/rasp-embed.csproj package Microsoft.NET.Build.Containers
+        run: dotnet remove $UT_PROJECT_LOCATION package Microsoft.NET.Build.Containers
       - name: Push to Docker registry
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/rasp-test:latest-embed-arm64
