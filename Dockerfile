@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["embedApp/rasp-embed/rasp-embed.csproj", "."]
 RUN dotnet restore "rasp-embed.csproj"
-COPY . .
+COPY embedApp/rasp-embed/ .
 RUN dotnet build "rasp-embed.csproj" -c Release -o /app/build
 
 FROM build AS publish
