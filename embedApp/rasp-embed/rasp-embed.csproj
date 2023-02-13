@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>rasp_embed</RootNamespace>
+    <ContainerImageName>uchitesting/rasp-test</ContainerImageName>
+    <ContainerImageTag>latest-embed-arm64</ContainerImageTag>
   </PropertyGroup>
 
 </Project>

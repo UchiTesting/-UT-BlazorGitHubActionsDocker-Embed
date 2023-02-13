@@ -5,9 +5,9 @@ name: .NET Image CI for ARM64
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
   # Allow manual run of the pipeline
   workflow_dispatch:
@@ -24,9 +24,9 @@ jobs:
           # According to https://github.com/actions/runner-images/issues/6539#issuecomment-1314127790
           dotnet-version: 7.x.x
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./embedApp/rasp-embed/rasp-embed.csproj
       - name: Build
-        run: dotnet build --no-restore && pwd && ls -l
+        run: dotnet build --no-restore ./embedApp/rasp-embed/rasp-embed.csproj && pwd && ls -l
 
   test:
     needs: build
@@ -39,7 +39,7 @@ jobs:
         with:
           dotnet-version: 7.x.x
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal ./embedApp/rasp-embed/rasp-embed.csproj
 
   containerize:
     needs: test
@@ -57,10 +57,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Add Containerizing NuGet package
-        run: dotnet add package Microsoft.NET.Build.Containers --version 0.3.2
+        run: dotnet add ./embedApp/rasp-embed/rasp-embed.csproj package Microsoft.NET.Build.Containers --version 0.3.2
       - name: Containerize with .NET 7.0
-        run: dotnet publish --os linux --arch arm64 -p:PublishProfile=DefaultContainer
+        run: dotnet publish ./embedApp/rasp-embed/rasp-embed.csproj --os linux --arch arm64 -p:PublishProfile=DefaultContainer
       - name: Remove Containerizing NuGet package
-        run: dotnet remove package Microsoft.NET.Build.Containers
+        run: dotnet remove ./embedApp/rasp-embed/rasp-embed.csproj package Microsoft.NET.Build.Containers
       - name: Push to Docker registry
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/rasp-test:latest-arm64
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/rasp-test:latest-embed-arm64
